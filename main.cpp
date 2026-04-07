@@ -57,7 +57,7 @@ int main() {
                                 if (currentFractal == FractalType::Koch) {
                                     generujKocha(settings.fractalIterations, settings.koch_p1, settings.koch_p2, punkty, settings.fractalColor);
                                 } else if (currentFractal == FractalType::Sierpinski) {
-                                    generujSierpinski(settings.fractalIterations+2, settings.sierpinski_p1, settings.sierpinski_p2, settings.sierpinski_p3, punkty, settings.fractalColor);
+                                    generujSierpinski(settings.fractalIterations, settings.sierpinski_p1, settings.sierpinski_p2, settings.sierpinski_p3, punkty, settings.fractalColor);
                                 } else if (currentFractal == FractalType::Tree) {
                                     generujTree(settings.fractalIterations*2, settings.tree_start, settings.tree_initial_length, 90.0f, punkty, settings.fractalColor, settings.tree_length_factor, settings.tree_angle_left, settings.tree_angle_right);
                                 }
