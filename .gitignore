@@ -1,7 +1,25 @@
 # Build artifacts
 Build/
+CMakeFiles/
 CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+Makefile
+
+# Build outputs
+*.exe
+*.dll
+*.lib
+*.obj
+*.o
+*.a
+*.so
+*.dylib
 
 # Editor files
 .vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
 
