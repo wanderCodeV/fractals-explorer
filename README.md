@@ -38,8 +38,8 @@ This project renders procedural fractals using SFML and provides a small UI for 
 
 <!-- 4. **Color change** <img src="screenshots/color_change.gif" width="400" /> -->
 
-### Dokumentacja
-- [Fraktale.pdf](documentation/Fraktale.pdf) – zawiera przystępne omówienie definicji fraktali oraz przykłady ich występowania, stanowiąc merytoryczne dopełnienie symulacji
+### Documentation
+- [Fraktale.pdf](documentation/Fraktale.pdf) – provides an accessible overview of fractal definitions and real-world examples, serving as a theoretical complement to the simulation
 
 ## Requirements
 
