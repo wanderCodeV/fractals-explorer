@@ -26,7 +26,7 @@ This project renders procedural fractals using SFML and provides a small UI for 
 ![Settings Panel](documentation/settings_panel.png)
 
 ### Videos 
-1. **Koch snowflake animation** <img src="documentation/koch_animation.gif" width="400" />
+1. **Koch snowflake animation** <img src="documentation/koch_animation.gif" width="200" />
 <!-- 
 2. **Sierpinski triangle animation** <img src="screenshots/sierpinski_zoom.gif" width="400" />
 
