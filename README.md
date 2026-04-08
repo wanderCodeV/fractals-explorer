@@ -29,14 +29,9 @@ This project renders procedural fractals using SFML and provides a small UI for 
 | Koch Snowflake | Sierpinski Triangle |
 | :---: | :---: |
 | <img src="documentation/koch_animation.gif" width="400" /> | <img src="documentation/sierpinski_triangle.gif" width="400" /> |
-
-<!-- 2. **Sierpinski triangle animation** 
-<img src="screenshots/sierpinski_zoom.gif" width="400" /> -->
-
-<!-- 3. **Fractal tree animation** 
-<img src="screenshots/fractal_tree.gif" width="400" /> -->
-
-<!-- 4. **Color change** <img src="screenshots/color_change.gif" width="400" /> -->
+| Fractal tree | Color change |
+| :---: | :---: |
+| <img src="documentation/fractal_tree.gif" width="400" /> | <img src="documentation/color_change.gif" width="400" /> |
 
 ### Documentation
 - [Fraktale.pdf](documentation/Fraktale.pdf) – provides an accessible overview of fractal definitions and real-world examples, serving as a theoretical complement to the simulation
