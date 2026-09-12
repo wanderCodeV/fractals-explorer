@@ -13,13 +13,12 @@ struct Settings {
     sf::Font font;
     
     // Fractal settings
-    int fractalIterations = 5;
     float drawSpeed = 0.5f;  
     float cameraZoom = 1.3f;
     
     // Colors
-    sf::Color backgroundColor = sf::Color(5, 5, 10);
-    sf::Color fractalColor = sf::Color::Red;
+    sf::Color backgroundColor = sf::Color::White;
+    sf::Color fractalColor = sf::Color(194, 123, 160);
 
     // UI Colors
     sf::Color tabInactiveColor = sf::Color(50, 50, 50);
@@ -49,7 +48,7 @@ struct Settings {
     float settingsPanelX = 1050;
     float settingsPanelY = 50;
     float settingsPanelWidth = 140;
-    float settingsPanelHeight = 280;  // Increased for color sliders
+    float settingsPanelHeight = 260;
     float settingsButtonSize = 30;
 
     Settings() {

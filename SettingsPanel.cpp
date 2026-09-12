@@ -3,15 +3,65 @@
 #include <sstream>
 #include <iomanip>
 #include <cstdint>
+#include <array>
 
 using namespace sf;
 using std::min;
 using std::max;
 
+void Slider::setup(const Vector2f& position, const Color& trackColor, const Color& handleColor) {
+    track.setSize(Vector2f(110, 5));
+    track.setPosition(position);
+    track.setFillColor(trackColor);
+    handle.setRadius(7);
+    handle.setFillColor(handleColor);
+    setRatio(0.0f);
+}
+
+void Slider::setRatio(float ratio) {
+    float clampedRatio = max(0.0f, min(ratio, 1.0f));
+    float x = track.getPosition().x + clampedRatio * track.getSize().x - handle.getRadius();
+    float y = track.getPosition().y + track.getSize().y * 0.5f - handle.getRadius();
+    handle.setPosition(Vector2f(x, y));
+}
+
+float Slider::ratioFromMouseX(float mouseX) const {
+    float trackStart = track.getPosition().x;
+    return max(0.0f, min((mouseX - trackStart) / track.getSize().x, 1.0f));
+}
+
+bool Slider::contains(const Vector2f& point) const {
+    return handle.getGlobalBounds().contains(point);
+}
+
+SliderBlock::SliderBlock(const Font& font, const std::string& text, const Vector2f& labelPosition)
+    : label(font, text, 12) {
+    label.setPosition(labelPosition);
+    label.setFillColor(Color::White);
+}
+
+Slider& SliderBlock::addSlider(const Vector2f& position, const Color& trackColor, const Color& handleColor,
+                               float minValue, float maxValue) {
+    sliders.emplace_back();
+    Slider& slider = sliders.back();
+    slider.minValue = minValue;
+    slider.maxValue = maxValue;
+    slider.setup(position, trackColor, handleColor);
+    return slider;
+}
+
+void SliderBlock::draw(RenderWindow& window) const {
+    window.draw(label);
+    for (const Slider& slider : sliders) {
+        window.draw(slider.track);
+        window.draw(slider.handle);
+    }
+}
+
 SettingsPanel::SettingsPanel(const Settings& settings)
-    : speedLabel(settings.font, "Speed", 12)
-    , backgroundColorLabel(settings.font, "Background color", 12)
-    , fractalColorLabel(settings.font, "Fractal color", 12)
+    : speedBlock(settings.font, "Speed", Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + 5))
+    , backgroundColorBlock(settings.font, "Background color", Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + 50))
+    , fractalColorBlock(settings.font, "Fractal color", Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + 130))
 {
     settingsButton.setRadius(settings.settingsButtonSize / 2.0f);
     settingsButton.setPosition(Vector2f(
@@ -26,58 +76,30 @@ SettingsPanel::SettingsPanel(const Settings& settings)
     panel.setOutlineThickness(2);
     panel.setOutlineColor(Color::White);
     
-    setupSlider(speedSliderTrack, speedSliderHandle, Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + 60), Color(50, 50, 50), Color::Cyan);
-    
-    speedLabel.setPosition(Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + 35));
-    speedLabel.setFillColor(Color::White);
-
-    // Background color label
-    backgroundColorLabel.setPosition(Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + 80));
-    backgroundColorLabel.setFillColor(Color::White);
-    
-    // Background color sliders
-    setupSlider(backgroundColorSliderTrackR, backgroundColorSliderHandleR, Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + 105), Color(80, 20, 20), Color::Red);
-    setupSlider(backgroundColorSliderTrackG, backgroundColorSliderHandleG, Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + 125), Color(20, 80, 20), Color::Green);
-    setupSlider(backgroundColorSliderTrackB, backgroundColorSliderHandleB, Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + 145), Color(20, 20, 80), Color::Blue);
-
-    // Fractal color label
-    fractalColorLabel.setPosition(Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + 180));
-    fractalColorLabel.setFillColor(Color::White);
-    
-    // Fractal color sliders
-    setupSlider(fractalColorSliderTrackR, fractalColorSliderHandleR, Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + 205), Color(80, 20, 20), Color::Red);
-    setupSlider(fractalColorSliderTrackG, fractalColorSliderHandleG, Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + 225), Color(20, 80, 20), Color::Green);
-    setupSlider(fractalColorSliderTrackB, fractalColorSliderHandleB, Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + 245), Color(20, 20, 80), Color::Blue);
+    speedBlock.addSlider(Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + 30), Color(50, 50, 50), Color::Cyan, 0.1f, 2.0f);
+    for (SliderBlock* block : {&backgroundColorBlock, &fractalColorBlock}) {
+        float offset = block == &backgroundColorBlock ? 80.0f : 160.0f;
+        block->addSlider(Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + offset), Color(80, 20, 20), Color::Red);
+        block->addSlider(Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + offset + 20), Color(20, 80, 20), Color::Green);
+        block->addSlider(Vector2f(settings.settingsPanelX + 15, settings.settingsPanelY + offset + 40), Color(20, 20, 80), Color::Blue);
+    }
 
     update(settings);
 }
 
 void SettingsPanel::update(const Settings& settings) {
-    float speedRatio = (settings.drawSpeed - speedMin) / (speedMax - speedMin);
-    updateSliderHandle(speedSliderTrack, speedSliderHandle, speedRatio);
+    Slider& speedSlider = speedBlock.sliders[0];
+    speedSlider.setRatio((settings.drawSpeed - speedSlider.minValue) / (speedSlider.maxValue - speedSlider.minValue));
 
-    float backgroundRedRatio = static_cast<float>(settings.backgroundColor.r) / 255.0f;
-    float backgroundGreenRatio = static_cast<float>(settings.backgroundColor.g) / 255.0f;
-    float backgroundBlueRatio = static_cast<float>(settings.backgroundColor.b) / 255.0f;
-
-    updateSliderHandle(backgroundColorSliderTrackR, backgroundColorSliderHandleR, backgroundRedRatio);
-    updateSliderHandle(backgroundColorSliderTrackG, backgroundColorSliderHandleG, backgroundGreenRatio);
-    updateSliderHandle(backgroundColorSliderTrackB, backgroundColorSliderHandleB, backgroundBlueRatio);
-
-    float fractalRedRatio = static_cast<float>(settings.fractalColor.r) / 255.0f;
-    float fractalGreenRatio = static_cast<float>(settings.fractalColor.g) / 255.0f;
-    float fractalBlueRatio = static_cast<float>(settings.fractalColor.b) / 255.0f;  
-
-    updateSliderHandle(fractalColorSliderTrackR, fractalColorSliderHandleR, fractalRedRatio);
-    updateSliderHandle(fractalColorSliderTrackG, fractalColorSliderHandleG, fractalGreenRatio);
-    updateSliderHandle(fractalColorSliderTrackB, fractalColorSliderHandleB, fractalBlueRatio);
+    updateColorSliders(backgroundColorBlock, settings.backgroundColor);
+    updateColorSliders(fractalColorBlock, settings.fractalColor);
 }
 
-void SettingsPanel::updateSliderHandle(RectangleShape& track, CircleShape& handle, float ratio) {
-    float clampedRatio = max(0.0f, min(ratio, 1.0f));
-    float x = track.getPosition().x + clampedRatio * track.getSize().x - handle.getRadius();
-    float y = track.getPosition().y + track.getSize().y * 0.5f - handle.getRadius();
-    handle.setPosition(Vector2f(x, y));
+void SettingsPanel::updateColorSliders(SliderBlock& block, const Color& color) {
+    const std::array<std::uint8_t, 3> channels = {color.r, color.g, color.b};
+    for (std::size_t i = 0; i < block.sliders.size() && i < channels.size(); ++i) {
+        block.sliders[i].setRatio(static_cast<float>(channels[i]) / 255.0f);
+    }
 }
 
 void SettingsPanel::handleMousePress(const Event::MouseButtonPressed& mouseEvent, Settings& settings, RenderWindow& window) {
@@ -91,92 +113,50 @@ void SettingsPanel::handleMousePress(const Event::MouseButtonPressed& mouseEvent
     }
     
     if (isOpen) {
-        if (speedSliderHandle.getGlobalBounds().contains(mousePos)) {
-            isDraggingSpeed = true;
-        } else if (backgroundColorSliderHandleR.getGlobalBounds().contains(mousePos)) {
-            isDraggingBackgroundColorR = true;
-        } else if (backgroundColorSliderHandleG.getGlobalBounds().contains(mousePos)) {
-            isDraggingBackgroundColorG = true;
-        } else if (backgroundColorSliderHandleB.getGlobalBounds().contains(mousePos)) {
-            isDraggingBackgroundColorB = true;
-        } else if (fractalColorSliderHandleR.getGlobalBounds().contains(mousePos)) {
-            isDraggingFractalColorR = true;
-        } else if (fractalColorSliderHandleG.getGlobalBounds().contains(mousePos)) {
-            isDraggingFractalColorG = true;
-        } else if (fractalColorSliderHandleB.getGlobalBounds().contains(mousePos)) {
-            isDraggingFractalColorB = true;
+        for (SliderBlock* block : {&speedBlock, &backgroundColorBlock, &fractalColorBlock}) {
+            for (Slider& slider : block->sliders) {
+                if (slider.contains(mousePos)) {
+                    slider.isDragging = true;
+                    return;
+                }
+            }
         }
     }
 }
 
 void SettingsPanel::handleMouseRelease(const Event::MouseButtonReleased& mouseEvent, Settings& settings) {
-    isDraggingSpeed = false;
-    isDraggingBackgroundColorR = false;
-    isDraggingBackgroundColorG = false;
-    isDraggingBackgroundColorB = false;
-    isDraggingFractalColorR = false;
-    isDraggingFractalColorG = false;
-    isDraggingFractalColorB = false;
+    for (SliderBlock* block : {&speedBlock, &backgroundColorBlock, &fractalColorBlock}) {
+        for (Slider& slider : block->sliders) {
+            slider.isDragging = false;
+        }
+    }
 }
 
 void SettingsPanel::handleMouseMove(const Vector2i& mousePos, Settings& settings) {
-    float mouseX = static_cast<float>(mousePos.x);
-    
-    if (isDraggingSpeed && isOpen) {
-        float trackStart = speedSliderTrack.getPosition().x;
-        float trackEnd = trackStart + speedSliderTrack.getSize().x;
-        mouseX = max(trackStart, min(mouseX, trackEnd));
-        float ratio = (mouseX - trackStart) / speedSliderTrack.getSize().x;
-        settings.drawSpeed = speedMin + ratio * (speedMax - speedMin);
-    }
-    
-    if (isDraggingBackgroundColorR && isOpen) {
-        float trackStart = backgroundColorSliderTrackR.getPosition().x;
-        float trackEnd = trackStart + backgroundColorSliderTrackR.getSize().x;
-        mouseX = max(trackStart, min(mouseX, trackEnd));
-        float ratio = (mouseX - trackStart) / backgroundColorSliderTrackR.getSize().x;
-        settings.backgroundColor.r = static_cast<std::uint8_t>(ratio * 255);
-    }
-    
-    if (isDraggingBackgroundColorG && isOpen) {
-        float trackStart = backgroundColorSliderTrackG.getPosition().x;
-        float trackEnd = trackStart + backgroundColorSliderTrackG.getSize().x;
-        mouseX = max(trackStart, min(mouseX, trackEnd));
-        float ratio = (mouseX - trackStart) / backgroundColorSliderTrackG.getSize().x;
-        settings.backgroundColor.g = static_cast<std::uint8_t>(ratio * 255);
-    }
-    
-    if (isDraggingBackgroundColorB && isOpen) {
-        float trackStart = backgroundColorSliderTrackB.getPosition().x;
-        float trackEnd = trackStart + backgroundColorSliderTrackB.getSize().x;
-        mouseX = max(trackStart, min(mouseX, trackEnd));
-        float ratio = (mouseX - trackStart) / backgroundColorSliderTrackB.getSize().x;
-        settings.backgroundColor.b = static_cast<std::uint8_t>(ratio * 255);
-    }
+    if (!isOpen) return;
 
-    if (isDraggingFractalColorR && isOpen) {
-        float trackStart = fractalColorSliderTrackR.getPosition().x;
-        float trackEnd = trackStart + fractalColorSliderTrackR.getSize().x;
-        mouseX = max(trackStart, min(mouseX, trackEnd));
-        float ratio = (mouseX - trackStart) / fractalColorSliderTrackR.getSize().x;
-        settings.fractalColor.r = static_cast<std::uint8_t>(ratio * 255);
-    }
+    auto updateColor = [&](SliderBlock& block, Color& color) {
+        for (std::size_t i = 0; i < block.sliders.size() && i < 3; ++i) {
+            Slider& slider = block.sliders[i];
+            if (!slider.isDragging) continue;
+            slider.setRatio(slider.ratioFromMouseX(static_cast<float>(mousePos.x)));
+            std::uint8_t value = static_cast<std::uint8_t>(slider.ratioFromMouseX(static_cast<float>(mousePos.x)) * 255.0f);
+            if (i == 0) color.r = value;
+            if (i == 1) color.g = value;
+            if (i == 2) color.b = value;
+        }
+    };
 
-    if (isDraggingFractalColorG && isOpen) {
-        float trackStart = fractalColorSliderTrackG.getPosition().x;
-        float trackEnd = trackStart + fractalColorSliderTrackG.getSize().x;
-        mouseX = max(trackStart, min(mouseX, trackEnd));
-        float ratio = (mouseX - trackStart) / fractalColorSliderTrackG.getSize().x;
-        settings.fractalColor.g = static_cast<std::uint8_t>(ratio * 255);
+    for (Slider& slider : speedBlock.sliders) {
+        if (slider.isDragging) {
+            float ratio = slider.ratioFromMouseX(static_cast<float>(mousePos.x));
+            slider.setRatio(ratio);
+            settings.drawSpeed = slider.minValue + ratio * (slider.maxValue - slider.minValue);
+        }
     }
-
-    if (isDraggingFractalColorB && isOpen) {
-        float trackStart = fractalColorSliderTrackB.getPosition().x;
-        float trackEnd = trackStart + fractalColorSliderTrackB.getSize().x;
-        mouseX = max(trackStart, min(mouseX, trackEnd));
-        float ratio = (mouseX - trackStart) / fractalColorSliderTrackB.getSize().x;
-        settings.fractalColor.b = static_cast<std::uint8_t>(ratio * 255);
-    }
+    
+    updateColor(backgroundColorBlock, settings.backgroundColor);
+    updateColor(fractalColorBlock, settings.fractalColor);
 }
 
 void SettingsPanel::drawSettingsButton(RenderWindow& window, const Settings& settings) {
@@ -204,36 +184,10 @@ void SettingsPanel::drawSettingsPanel(RenderWindow& window, const Settings& sett
     if (!isOpen) return;
     
     window.draw(panel);
-    window.draw(speedLabel);
-    window.draw(speedSliderTrack);
-    window.draw(speedSliderHandle);
-    
-    // Background color section
-    window.draw(backgroundColorLabel);
-    window.draw(backgroundColorSliderTrackR);
-    window.draw(backgroundColorSliderHandleR);
-    window.draw(backgroundColorSliderTrackG);
-    window.draw(backgroundColorSliderHandleG);
-    window.draw(backgroundColorSliderTrackB);
-    window.draw(backgroundColorSliderHandleB);
 
-    // Fractal color section
-    window.draw(fractalColorLabel);
-    window.draw(fractalColorSliderTrackR);
-    window.draw(fractalColorSliderHandleR);
-    window.draw(fractalColorSliderTrackG);
-    window.draw(fractalColorSliderHandleG);
-    window.draw(fractalColorSliderTrackB);
-    window.draw(fractalColorSliderHandleB);
-}
-
-void SettingsPanel::setupSlider(RectangleShape& track, CircleShape& handle, const Vector2f& position, const Color& trackColor, const Color& handleColor) {
-    track.setSize(Vector2f(110, 5));
-    track.setPosition(position);
-    track.setFillColor(trackColor);
-    handle.setRadius(7);
-    handle.setFillColor(handleColor);
-    handle.setPosition(Vector2f(position.x - 4.0f, position.y - 2.0f));
+    speedBlock.draw(window);
+    backgroundColorBlock.draw(window);
+    fractalColorBlock.draw(window);
 }
 
 void SettingsPanel::draw(RenderWindow& window, const Settings& settings) {

@@ -20,6 +20,8 @@ add_executable(FractalApp
     Tab.h
     Fractals.cpp 
     Fractals.h
+    Mandelbrot.cpp
+    Mandelbrot.h
     Settings.h
     SettingsPanel.cpp
     SettingsPanel.h

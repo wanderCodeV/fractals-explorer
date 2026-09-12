@@ -2,34 +2,41 @@
 
 #include <SFML/Graphics.hpp>
 #include "Settings.h"
+#include <string>
+#include <vector>
+
+struct Slider {
+    sf::RectangleShape track;
+    sf::CircleShape handle;
+    float minValue = 0.0f;
+    float maxValue = 1.0f;
+    bool isDragging = false;
+
+    void setup(const sf::Vector2f& position, const sf::Color& trackColor, const sf::Color& handleColor);
+    void setRatio(float ratio);
+    float ratioFromMouseX(float mouseX) const;
+    bool contains(const sf::Vector2f& point) const;
+};
+
+struct SliderBlock {
+    sf::Text label;
+    std::vector<Slider> sliders;
+
+    SliderBlock(const sf::Font& font, const std::string& text, const sf::Vector2f& labelPosition);
+    Slider& addSlider(const sf::Vector2f& position, const sf::Color& trackColor, const sf::Color& handleColor,
+                      float minValue = 0.0f, float maxValue = 1.0f);
+    void draw(sf::RenderWindow& window) const;
+};
 
 class SettingsPanel {
 public:
-    sf::CircleShape settingsButton;  // Gear/settings button
-    sf::RectangleShape panel;        // Settings panel background
+    sf::CircleShape settingsButton;
+    sf::RectangleShape panel;
     bool isOpen = false;
-    
-    // Slider elements for speed
-    sf::RectangleShape speedSliderTrack;
-    sf::CircleShape speedSliderHandle;
-    float speedMin = 0.1f;
-    float speedMax = 2.0f;
-    bool isDraggingSpeed = false;
-    
-    // Slider elements for background color
-    sf::RectangleShape backgroundColorSliderTrackR, backgroundColorSliderTrackG, backgroundColorSliderTrackB;
-    sf::CircleShape backgroundColorSliderHandleR, backgroundColorSliderHandleG, backgroundColorSliderHandleB;
-    bool isDraggingBackgroundColorR = false, isDraggingBackgroundColorG = false, isDraggingBackgroundColorB = false;
-    
-    // Slider elements for fractal color
-    sf::RectangleShape fractalColorSliderTrackR, fractalColorSliderTrackG, fractalColorSliderTrackB;
-    sf::CircleShape fractalColorSliderHandleR, fractalColorSliderHandleG, fractalColorSliderHandleB;
-    bool isDraggingFractalColorR = false, isDraggingFractalColorG = false, isDraggingFractalColorB = false;
-    
-    // Text elements
-    sf::Text speedLabel;
-    sf::Text backgroundColorLabel;
-    sf::Text fractalColorLabel;
+
+    SliderBlock speedBlock;
+    SliderBlock backgroundColorBlock;
+    SliderBlock fractalColorBlock;
     
     SettingsPanel(const Settings& settings);
     void update(const Settings& settings);
@@ -41,6 +48,5 @@ public:
     void draw(sf::RenderWindow& window, const Settings& settings);
 
 private:
-    void setupSlider(sf::RectangleShape& track, sf::CircleShape& handle, const sf::Vector2f& position, const sf::Color& trackColor, const sf::Color& handleColor);
-    void updateSliderHandle(sf::RectangleShape& track, sf::CircleShape& handle, float ratio);
+    void updateColorSliders(SliderBlock& block, const sf::Color& color);
 };
