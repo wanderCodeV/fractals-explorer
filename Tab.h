@@ -3,7 +3,18 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 
-enum class FractalType { Koch, Sierpinski, Tree, Mandelbrot };
+enum class FractalType {
+    Koch,
+    Sierpinski,
+    SierpinskiCarpet,
+    SierpinskiPentagon,
+    Tree,
+    Pythagoras,
+    BarnsleyFern,
+    Vicsek,
+    Hilbert,
+    Mandelbrot
+};
 
 struct Tab {
     sf::RectangleShape shape;

@@ -5,6 +5,12 @@
 
 namespace {
 constexpr double pi = 3.14159265358979323846;
+constexpr double focusPoints[][2] = {
+    {-0.743643887037151, 0.13182590420533},
+    {-0.101096, 0.956286},
+    {-0.088, 0.654}
+};
+constexpr int focusPointCount = sizeof(focusPoints) / sizeof(focusPoints[0]);
 }
 
 MandelbrotExplorer::MandelbrotExplorer(unsigned int width, unsigned int height)
@@ -28,8 +34,13 @@ void MandelbrotExplorer::reset(int iterationLevel) {
     centerX = -0.5;
     centerY = 0.0;
     viewWidth = 3.5;
+    manualViewWidth = 3.5;
     rotation = 0.0;
     targetRotation = 0.0;
+    animationTime = 0.0;
+    focusCycle = -1;
+    focusStartX = centerX;
+    focusStartY = centerY;
     maxIterations = std::clamp(iterationLevel * 16, 64, 160);
     colorOffset = 0;
     hasMousePosition = false;
@@ -51,7 +62,7 @@ void MandelbrotExplorer::handleMouseClick(sf::Mouse::Button button, const sf::Ve
     }
 
     const double oldViewWidth = viewWidth;
-    const double zoomFactor = button == sf::Mouse::Button::Left ? 0.75 : 1.0 / 0.75;
+    const double zoomFactor = button == sf::Mouse::Button::Left ? 0.35 : 1.0 / 0.35;
     const double offsetX = (static_cast<double>(mousePosition.x) / displayWidth - 0.5) * oldViewWidth;
     const double offsetY = (0.5 - static_cast<double>(mousePosition.y) / displayHeight) * oldViewWidth * displayHeight / displayWidth;
     const double cosine = std::cos(rotation);
@@ -59,8 +70,9 @@ void MandelbrotExplorer::handleMouseClick(sf::Mouse::Button button, const sf::Ve
     const double clickedReal = centerX + offsetX * cosine - offsetY * sine;
     const double clickedImaginary = centerY + offsetX * sine + offsetY * cosine;
 
-    viewWidth *= zoomFactor;
-    targetRotation += button == sf::Mouse::Button::Left ? pi / 36.0 : -pi / 36.0;
+    manualViewWidth *= zoomFactor;
+    viewWidth = manualViewWidth;
+    targetRotation += button == sf::Mouse::Button::Left ? pi / 8.0 : -pi / 8.0;
     const double newOffsetX = offsetX * viewWidth / oldViewWidth;
     const double newOffsetY = offsetY * viewWidth / oldViewWidth;
     centerX = clickedReal - (newOffsetX * cosine - newOffsetY * sine);
@@ -98,15 +110,17 @@ void MandelbrotExplorer::handleMouseRelease(sf::Mouse::Button button) {
 }
 
 void MandelbrotExplorer::handleKeyPressed(sf::Keyboard::Key key) {
-    const double zoomFactor = 0.82;
+    const double zoomFactor = 0.35;
     const double rotationStep = pi / 5.0;
 
     if (key == sf::Keyboard::Key::Up) {
-        viewWidth *= zoomFactor;
+        manualViewWidth *= zoomFactor;
+        viewWidth = manualViewWidth;
         targetRotation += rotationStep;
         needsRedraw = true;
     } else if (key == sf::Keyboard::Key::Down) {
-        viewWidth /= zoomFactor;
+        manualViewWidth /= zoomFactor;
+        viewWidth = manualViewWidth;
         targetRotation -= rotationStep;
         needsRedraw = true;
     } else if (key == sf::Keyboard::Key::Left) {
@@ -118,16 +132,40 @@ void MandelbrotExplorer::handleKeyPressed(sf::Keyboard::Key key) {
     }
 }
 
-void MandelbrotExplorer::update() {
+void MandelbrotExplorer::update(bool automaticAnimation) {
     const double elapsedSeconds = rotationClock.restart().asSeconds();
-    const double difference = targetRotation - rotation;
-    const double maximumStep = elapsedSeconds * 1.5;
+    if (automaticAnimation) {
+        animationTime += elapsedSeconds;
+        constexpr double zoomCycleSeconds = 18.0;
+        const double cycleProgress = std::fmod(animationTime, zoomCycleSeconds) / zoomCycleSeconds;
+        const double zoomProgress = cycleProgress <= 0.5
+            ? cycleProgress * 2.0
+            : (1.0 - cycleProgress) * 2.0;
+        const double deepZoomFactor = std::pow(10.0, -10.0 * zoomProgress);
+        viewWidth = manualViewWidth * deepZoomFactor;
 
-    if (std::abs(difference) > 0.0001) {
-        rotation += std::clamp(difference, -maximumStep, maximumStep);
-        needsRedraw = true;
-    } else {
-        rotation = targetRotation;
+        const int currentCycle = static_cast<int>(animationTime / zoomCycleSeconds);
+        if (currentCycle != focusCycle) {
+            focusCycle = currentCycle;
+            focusStartX = centerX;
+            focusStartY = centerY;
+        }
+
+        const int focusIndex = currentCycle % focusPointCount;
+        const double transition = std::clamp(cycleProgress / 0.18, 0.0, 1.0);
+        const double smoothTransition = transition * transition * (3.0 - 2.0 * transition);
+        centerX = focusStartX + (focusPoints[focusIndex][0] - focusStartX) * smoothTransition;
+        centerY = focusStartY + (focusPoints[focusIndex][1] - focusStartY) * smoothTransition;
+        const double animatedTargetRotation = targetRotation + animationTime * 0.35;
+        const double difference = animatedTargetRotation - rotation;
+        const double maximumStep = elapsedSeconds * 3.5;
+
+        if (std::abs(difference) > 0.0001) {
+            rotation += std::clamp(difference, -maximumStep, maximumStep);
+            needsRedraw = true;
+        } else {
+            rotation = animatedTargetRotation;
+        }
     }
 }
 

@@ -12,7 +12,7 @@ public:
     void handleMouseMove(const sf::Vector2i& mousePosition);
     void handleMouseRelease(sf::Mouse::Button button);
     void handleKeyPressed(sf::Keyboard::Key key);
-    void update();
+    void update(bool automaticAnimation);
     void draw(sf::RenderWindow& window);
 
 private:
@@ -27,8 +27,13 @@ private:
     double centerX = -0.5;
     double centerY = 0.0;
     double viewWidth = 3.5;
+    double manualViewWidth = 3.5;
     double rotation = 0.0;
     double targetRotation = 0.0;
+    double animationTime = 0.0;
+    int focusCycle = -1;
+    double focusStartX = -0.5;
+    double focusStartY = 0.0;
     int maxIterations = 180;
     int colorOffset = 0;
     sf::Vector2i lastMousePosition;
