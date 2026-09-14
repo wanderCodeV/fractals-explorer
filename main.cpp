@@ -18,21 +18,21 @@ namespace
 {
     struct TabDefinition
     {
-        const char *label;
+        const char* label;
         FractalType type;
     };
-    constexpr std::array<TabDefinition, 10> kTabs = {{
-        {"Koch Snowflake", FractalType::Koch},
-        {"Sierpinski Triangle", FractalType::Sierpinski},
-        {"Sierpinski Carpet", FractalType::SierpinskiCarpet},
-        {"Sierpinski Pentagon", FractalType::SierpinskiPentagon},
-        {"Fractal Tree", FractalType::Tree},
-        {"Dragon Curve", FractalType::Dragon},
-        {"Pythagoras Tree", FractalType::Pythagoras},
-        {"Vicsek Fractal", FractalType::Vicsek},
-        {"Hilbert Curve", FractalType::Hilbert},
-        {"Newton Fractal", FractalType::Newton},
-    }};
+    constexpr std::array<TabDefinition, 10> kTabs = { {
+        { "Koch Snowflake", FractalType::Koch },
+        { "Sierpinski Triangle", FractalType::Sierpinski },
+        { "Sierpinski Carpet", FractalType::SierpinskiCarpet },
+        { "Sierpinski Pentagon", FractalType::SierpinskiPentagon },
+        { "Fractal Tree", FractalType::Tree },
+        { "Dragon Curve", FractalType::Dragon },
+        { "Pythagoras Tree", FractalType::Pythagoras },
+        { "Vicsek Fractal", FractalType::Vicsek },
+        { "Hilbert Curve", FractalType::Hilbert },
+        { "Newton Fractal", FractalType::Newton },
+    } };
 }
 
 int main()
@@ -44,7 +44,7 @@ int main()
         "Fractal Explorer");
 
     SettingsPanel settingsPanel(settings);
-    NewtonExplorer newton(settings.windowWidth, settings.windowHeight, settings.font, settings.fractalColor);
+    NewtonExplorer newton(settings.windowWidth, settings.windowHeight, settings.font);
     FractalController controller(newton, settings);
     sf::View camera = window.getDefaultView();
 
@@ -70,7 +70,7 @@ int main()
         // --- Input ---
         while (auto eventOpt = window.pollEvent())
         {
-            const sf::Event &event = *eventOpt;
+            const sf::Event& event = *eventOpt;
             if (event.is<sf::Event::Closed>())
                 window.close();
 
@@ -87,7 +87,7 @@ int main()
                         settingsPanel.handleMousePress(*mouseEvent, settings, window);
 
                     const sf::Vector2f mousePosF(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
-                    for (Tab &tab : tabs)
+                    for (Tab& tab : tabs)
                     {
                         if (tab.shape.getGlobalBounds().contains(mousePosF) && controller.currentType != tab.type)
                         {
@@ -128,7 +128,7 @@ int main()
         controller.draw(window, settings, camera);
         window.setView(window.getDefaultView());
 
-        for (Tab &tab : tabs)
+        for (Tab& tab : tabs)
             tab.draw(window, controller.currentType, settings.fractalColor);
 
         if (!isExplorerMode(controller.currentType))

@@ -88,7 +88,6 @@ void FractalController::animateOscillatingAngle(float& angle, float& direction,
 void FractalController::syncPalette(Settings& settings)
 {
     palette = makePalette(settings.fractalColor);
-    newton.setPalette(settings.fractalColor);
 }
 
 PythagorasSquare FractalController::createPythagorasRoot(const Settings& settings) const
