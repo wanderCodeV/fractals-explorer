@@ -1,31 +1,29 @@
 cmake_minimum_required(VERSION 3.10)
-project(Fractals)
 
-# 1. Standard C++ (wymagany dla Twojego kodu)
+project(Fractals)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# 2. Ścieżka do konfiguracji SFML
-# Używamy zwykłych ukośników '/', CMake je preferuje
+# Config SFML
 set(SFML_DIR "D:/Soft/SFML-3.0.2/lib/cmake/SFML")
-
-# 3. Szukanie pakietu - TUTAJ BYŁ BŁĄD
-# W COMPONENTS podajemy tylko: Graphics, Window, System
+# Find SFML package
 find_package(SFML 3.0.2 COMPONENTS Graphics Window System REQUIRED)
-
-# 4. Dodanie plików źródłowych
+# Add source files and headers to the executable
 add_executable(FractalApp 
     main.cpp 
     Tab.cpp 
     Tab.h
     Fractals.cpp 
     Fractals.h
-    Mandelbrot.cpp
-    Mandelbrot.h
+    NewtonExplorer.cpp
+    NewtonExplorer.h
     Settings.h
     SettingsPanel.cpp
     SettingsPanel.h
+    RenderUtils.cpp
+    RenderUtils.h
+    FractalController.cpp
+    FractalController.h
 )
-
-# 5. Linkowanie - tutaj używamy nazw z prefiksem SFML::
+# Link SFML libraries to the executable
 target_link_libraries(FractalApp SFML::Graphics SFML::Window SFML::System)
+
