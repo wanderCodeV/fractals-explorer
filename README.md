@@ -12,20 +12,16 @@ This project renders procedural fractals using SFML and provides a small UI for 
 
 ## Features
 
-- Koch snowflake fractal
-- Animated Koch construction from one bold horizontal segment through successive triangle replacements
+- Koch snowflake fractal - animated Koch construction from one bold horizontal segment through successive triangle replacements
 - Sierpinski triangle fractal
-- Sierpinski carpet and pentagon fractals
-- Sierpinski animation with filled triangles and an unfilled central triangle
-- Fractal tree starting from a bold vertical trunk
+- Sierpinski carpet and pentagon fractals - Sierpinski animation with filled triangles and an unfilled central triangle
+- Fractal tree starting with adjustable angle and depth
 - Dragon, Vicsek fractal, and Hilbert curve
 - Pythagoras tree with adjustable angle and depth
 - Newton fractal for z^n - 1 = 0 with root-based coloring
 - Five shades derived from the base fractal color
 - Color sliders for fractal color and background
 - Speed control
-- Ten construction stages for each procedural fractal
-- Camera view
 - Simple tabbed UI and settings panel
 
 ### Newton fractal controls
@@ -38,11 +34,10 @@ This project renders procedural fractals using SFML and provides a small UI for 
 ### Animation controls
 
 - Press `Space` to pause or resume the current fractal construction.
-- Koch, Sierpinski, and Tree are built progressively, one subdivision or branch level at a time.
+- Koch, Sierpinski, Dragon, Vicsek fractal, and Hilbert curve are built progressively, one subdivision or branch level at a time.
 - While construction is paused, press `Left` or `Right` to move one level backward or forward.
 - While construction is running, the `Speed` setting controls the delay between levels.
-- In Pythagoras Tree mode, `Up`/`Down` change the angle and `Left`/`Right` change the depth.
-- New fractals use the same animated level construction; `Left` and `Right` change their level while paused.
+- In Pythagoras Tree and Fractal Tree mode, `Up`/`Down` change the angle and `Left`/`Right` change the depth.
 
 ## Screenshots
 
