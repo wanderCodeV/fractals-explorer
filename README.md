@@ -54,14 +54,14 @@ This project renders procedural fractals using SFML and provides a small UI for 
 
 | Fractal Tree | Dragon Curve | Color from base |
 | :---: | :---: | :---: |
-| ![](documentation/fractal_tree.png) | ![](documentation/dragon_curve.png) | ![](documentation/color_palette.png) |
+| <img src="documentation/fractal_tree.png" height="250" /> | <img src="documentation/dragon_curve.png" height="250" /> | <img src="documentation/color_palette.png" height="250" /> |
 
 ### Videos
 | Koch Snowflake | Sierpinski Triangle |
 | :---: | :---: |
 | <img src="documentation/koch_animation.gif" width="400" /> | <img src="documentation/sierpinski_triangle.gif" width="400" /> |
-| Fractal tree | Color change |
-| <img src="documentation/fractal_tree.gif" width="400" /> | <img src="documentation/color_change.gif" width="400" /> |
+| Fractal tree | Pythagoras tree |
+| <img src="documentation/fractal_tree.gif" width="400" /> | <img src="documentation/pythagoras_tree.gif" width="400" /> |
 
 ### Documentation
 - [Fraktale.pdf](documentation/Fraktale.pdf) – provides an accessible overview of fractal definitions and real-world examples, serving as a theoretical complement to the simulation
