@@ -46,8 +46,6 @@ This project renders procedural fractals using SFML and provides a small UI for 
 
 ## Screenshots
 
-Capture these at **1600×900** after building, then save them under `documentation/`.
-
 ![App overview](documentation/hero_overview.png)
 
 | Sierpinski Triangle | Sierpinski Carpet | Newton (n=3) |
@@ -57,22 +55,6 @@ Capture these at **1600×900** after building, then save them under `documentati
 | Fractal Tree | Dragon Curve | Color from base |
 | :---: | :---: | :---: |
 | ![](documentation/fractal_tree.png) | ![](documentation/dragon_curve.png) | ![](documentation/color_palette.png) |
-
-**Recommended captures**
-
-| File | What to capture |
-| :--- | :--- |
-| `hero_overview.png` | Full window with tabs, mid-stage fractal, settings gear visible |
-| `settings_panel.png` | Settings panel open with sliders |
-| `sierpinski_triangle_steps.png` | Sierpinski Triangle paused around stage 6 (multi-color steps) |
-| `sierpinski_carpet.png` | Sierpinski Carpet at full stage |
-| `newton_n3.png` | Newton fractal at n=3 with toggle button visible |
-| `newton_n6.png` | Newton at n=6 (optional second Newton shot) |
-| `color_palette.png` | Same fractal with two different base colors |
-| `fractal_tree.png` | Fractal Tree at full stage |
-| `dragon_curve.png` | Dragon Curve around stage 8 |
-
-**Tips:** Press `Space` to pause before PNG screenshots. Use GIFs only for animations (`koch_animation.gif`, `newton_toggle.gif`).
 
 ### Videos
 | Koch Snowflake | Sierpinski Triangle |
