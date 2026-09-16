@@ -50,7 +50,7 @@ This project renders procedural fractals using SFML and provides a small UI for 
 
 | Sierpinski Triangle | Sierpinski Carpet | Newton (n=3) |
 | :---: | :---: | :---: |
-| ![](documentation/sierpinski_triangle_steps.png) | ![](documentation/sierpinski_carpet.png) | ![](documentation/newton_n3.png) |
+| <img src="documentation/sierpinski_triangle_steps.png" height="250" /> | <img src="documentation/sierpinski_carpet.png" height="250" /> | <img src="documentation/newton_n3.png" height="250" /> |
 
 | Fractal Tree | Dragon Curve | Color from base |
 | :---: | :---: | :---: |
